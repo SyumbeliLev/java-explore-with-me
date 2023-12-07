@@ -1,4 +1,4 @@
-package ru.practicum.server.model;
+package ru.practicum.server.entity;
 
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,15 +12,14 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Table(name = "endpoint_hit")
 public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
-    String app;
-    String uri;
-    String ip;
+    private Long id;
+    private String app;
+    private String uri;
+    private String ip;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 }

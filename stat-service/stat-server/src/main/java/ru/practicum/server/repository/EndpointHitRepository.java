@@ -3,7 +3,7 @@ package ru.practicum.server.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.practicum.server.model.EndpointHit;
+import ru.practicum.server.entity.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.util.List;

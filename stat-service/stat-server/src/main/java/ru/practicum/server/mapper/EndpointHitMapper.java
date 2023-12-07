@@ -3,24 +3,22 @@ package ru.practicum.server.mapper;
 import lombok.experimental.UtilityClass;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.server.model.EndpointHit;
+import ru.practicum.server.entity.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @UtilityClass
 public class EndpointHitMapper {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public EndpointHit toEndpointHit(EndpointHitDto hitDto) {
         return EndpointHit.builder()
                 .app(hitDto.getApp())
                 .ip(hitDto.getIp())
-                .timestamp(toDateFromString(hitDto.getTimestamp()))
+                .timestamp(LocalDateTime.parse(hitDto.getTimestamp(), DATE_TIME_FORMATTER))
                 .uri(hitDto.getUri())
                 .build();
-    }
-
-    public LocalDateTime toDateFromString(String date) {
-        return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     public ViewStatsDto toViewStatsDto(String app, String uri, long hits) {

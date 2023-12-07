@@ -23,6 +23,7 @@ import java.util.List;
 public class StatsController {
 
     private final StatsClient statsClient;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @PostMapping("/hit")
     public ResponseEntity<Object> createHit(@RequestBody EndpointHitDto hitDto) {
@@ -35,11 +36,13 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Object> getStats(@RequestParam String start, @RequestParam String end,
-                                           @RequestParam(required = false) List<String> uris, @RequestParam(required = false) Boolean unique) {
+    public ResponseEntity<Object> getStats(@RequestParam String start,
+                                           @RequestParam String end,
+                                           @RequestParam(required = false) List<String> uris,
+                                           @RequestParam(required = false) Boolean unique) {
 
-        LocalDateTime startDate = LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime endDate = LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime startDate = LocalDateTime.parse(start, DATE_TIME_FORMATTER);
+        LocalDateTime endDate = LocalDateTime.parse(end, DATE_TIME_FORMATTER);
 
         if (startDate.isAfter(endDate) || endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("The date is incorrect!");
