@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.server.mapper.EndpointHitMapper;
 import ru.practicum.server.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.server.mapper.EndpointHitMapper.toEndpointHit;
-import static ru.practicum.server.mapper.EndpointHitMapper.toViewStatsDto;
+
 
 
 @Service
@@ -25,7 +25,7 @@ class StatsServiceImpl implements StatsService {
 
     @Override
     public EndpointHitDto saveHit(EndpointHitDto dto) {
-        repository.save(toEndpointHit(dto));
+        repository.save(EndpointHitMapper.toEndpointHit(dto));
         return dto;
     }
 
@@ -43,7 +43,7 @@ class StatsServiceImpl implements StatsService {
                 hits = repository.findHitsByUriNotUniqueIp(start, end, uri);
             }
 
-            stats.add(toViewStatsDto("ewm-main-service", uri, hits));
+            stats.add(EndpointHitMapper.toViewStatsDto("ewm-main-service", uri, hits));
         }
         return stats.stream()
                 .sorted(Comparator.comparingLong(x -> -x.getHits()))
