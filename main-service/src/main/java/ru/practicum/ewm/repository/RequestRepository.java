@@ -1,9 +1,8 @@
 package ru.practicum.ewm.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.practicum.ewm.entity.enums.RequestStatus;
 import ru.practicum.ewm.entity.Request;
-
+import ru.practicum.ewm.entity.enums.RequestStatus;
 
 import java.util.List;
 import java.util.Optional;

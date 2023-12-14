@@ -3,16 +3,16 @@ package ru.practicum.ewm.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.entity.Event;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.category.NewCategoryDto;
 import ru.practicum.ewm.entity.Category;
+import ru.practicum.ewm.entity.Event;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.CategoryMapper;
-import ru.practicum.ewm.service.CategoryService;
 import ru.practicum.ewm.repository.CategoryRepository;
 import ru.practicum.ewm.repository.EventRepository;
+import ru.practicum.ewm.service.CategoryService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +27,9 @@ class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getCategories(Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return categoryRepository.findAll(pageRequest)
-                .stream().map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
+                .stream()
+                .map(CategoryMapper::toCategoryDto)
+                .collect(Collectors.toList());
     }
 
 
@@ -59,7 +61,8 @@ class CategoryServiceImpl implements CategoryService {
         Category oldCategory = checkCategory(catId);
         String newName = categoryDto.getName();
 
-        if (newName != null && !oldCategory.getName().equals(newName)) {
+        if (newName != null && !oldCategory.getName()
+                .equals(newName)) {
             checkUniqNameCategoryIgnoreCase(newName);
         }
 
@@ -76,7 +79,8 @@ class CategoryServiceImpl implements CategoryService {
     }
 
     private Category checkCategory(Long catId) {
-        return categoryRepository.findById(catId).orElseThrow(() ->
-                new NotFoundException("Категории с id = " + catId + " не существует"));
+        return categoryRepository.findById(catId)
+                .orElseThrow(() ->
+                        new NotFoundException("Категории с id = " + catId + " не существует"));
     }
 }

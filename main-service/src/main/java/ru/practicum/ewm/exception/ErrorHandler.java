@@ -1,7 +1,6 @@
 package ru.practicum.ewm.exception;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

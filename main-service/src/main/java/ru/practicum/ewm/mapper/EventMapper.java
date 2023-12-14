@@ -1,17 +1,15 @@
 package ru.practicum.ewm.mapper;
 
 import lombok.experimental.UtilityClass;
-
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
-
 import ru.practicum.ewm.entity.Event;
-
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @UtilityClass
 public class EventMapper {
     public Event toEvent(NewEventDto newEventDto) {
@@ -61,6 +59,8 @@ public class EventMapper {
 
     public List<EventShortDto> eventToEventShortDtoList(List<Event> events) {
         return events == null ? new ArrayList<>() :
-                events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+                events.stream()
+                        .map(EventMapper::toEventShortDto)
+                        .collect(Collectors.toList());
     }
 }

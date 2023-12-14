@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.HitDto;
 import ru.practicum.ewm.StatsDto;
-import ru.practicum.ewm.repository.EndpointHitRepository;
 import ru.practicum.ewm.mapper.EndpointHitMapper;
+import ru.practicum.ewm.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

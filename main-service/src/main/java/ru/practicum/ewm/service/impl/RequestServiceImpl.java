@@ -2,21 +2,20 @@ package ru.practicum.ewm.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.entity.Event;
+import ru.practicum.ewm.entity.Request;
 import ru.practicum.ewm.entity.User;
 import ru.practicum.ewm.entity.enums.EventStatus;
 import ru.practicum.ewm.entity.enums.RequestStatus;
-import ru.practicum.ewm.exception.UncorrectedParametersException;
-import ru.practicum.ewm.mapper.RequestMapper;
-import ru.practicum.ewm.service.RequestService;
-import ru.practicum.ewm.dto.request.ParticipationRequestDto;
-import ru.practicum.ewm.entity.Request;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.exception.UncorrectedParametersException;
+import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.UserRepository;
-
+import ru.practicum.ewm.service.RequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,15 +60,20 @@ public class RequestServiceImpl implements RequestService {
     public List<ParticipationRequestDto> getRequestsByUserId(Long userId) {
         checkUser(userId);
         List<Request> result = requestRepository.findAllByRequesterId(userId);
-        return result.stream().map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList());
+        return result.stream()
+                .map(RequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         checkUser(userId);
-        Request request = requestRepository.findByIdAndRequesterId(requestId, userId).orElseThrow(
-                () -> new NotFoundException("Запрос с id= " + requestId + " не найден"));
-        if (request.getStatus().equals(RequestStatus.CANCELED) || request.getStatus().equals(RequestStatus.REJECTED)) {
+        Request request = requestRepository.findByIdAndRequesterId(requestId, userId)
+                .orElseThrow(
+                        () -> new NotFoundException("Запрос с id= " + requestId + " не найден"));
+        if (request.getStatus()
+                .equals(RequestStatus.CANCELED) || request.getStatus()
+                .equals(RequestStatus.REJECTED)) {
             throw new UncorrectedParametersException("Запрос не подтвержден");
         }
         request.setStatus(RequestStatus.CANCELED);
@@ -78,18 +82,22 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private User checkUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("Категории с id = " + userId + " не существует"));
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new NotFoundException("Категории с id = " + userId + " не существует"));
     }
 
     private void validateNewRequest(Event event, Long userId, Long eventId) {
-        if (event.getInitiator().getId().equals(userId)) {
+        if (event.getInitiator()
+                .getId()
+                .equals(userId)) {
             throw new ConflictException("Пользователь с id= " + userId + " не инициатор события");
         }
         if (event.getParticipantLimit() > 0 && event.getParticipantLimit() <= requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED)) {
             throw new ConflictException("Превышен лимит участников события");
         }
-        if (!event.getEventStatus().equals(EventStatus.PUBLISHED)) {
+        if (!event.getEventStatus()
+                .equals(EventStatus.PUBLISHED)) {
             throw new ConflictException("Событие не опубликовано");
         }
         if (requestRepository.existsByEventIdAndRequesterId(eventId, userId)) {

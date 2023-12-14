@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.service.RequestService;
+
 import javax.validation.constraints.Min;
 import java.util.List;
 

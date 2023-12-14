@@ -4,18 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import ru.practicum.ewm.entity.Event;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
-import ru.practicum.ewm.dto.compilation.UpdateCompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
+import ru.practicum.ewm.dto.compilation.UpdateCompilationDto;
 import ru.practicum.ewm.entity.Compilation;
+import ru.practicum.ewm.entity.Event;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.UncorrectedParametersException;
 import ru.practicum.ewm.mapper.CompilationMapper;
-import ru.practicum.ewm.service.CompilationService;
 import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.EventRepository;
+import ru.practicum.ewm.service.CompilationService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,7 +42,6 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilationAfterSave = compilationRepository.save(compilation);
         return CompilationMapper.toDto(compilationAfterSave);
     }
-
 
 
     @Transactional

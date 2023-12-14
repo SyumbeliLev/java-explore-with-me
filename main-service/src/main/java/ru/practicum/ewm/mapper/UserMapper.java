@@ -1,7 +1,6 @@
 package ru.practicum.ewm.mapper;
 
 import lombok.experimental.UtilityClass;
-
 import ru.practicum.ewm.dto.request.NewUserRequest;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.dto.user.UserShortDto;

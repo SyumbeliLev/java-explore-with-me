@@ -7,7 +7,8 @@ public enum EventAdminState {
 
     public static Optional<EventAdminState> from(String stringState) {
         for (EventAdminState state : values()) {
-            if (state.name().equalsIgnoreCase(stringState)) {
+            if (state.name()
+                    .equalsIgnoreCase(stringState)) {
                 return Optional.of(state);
             }
         }
