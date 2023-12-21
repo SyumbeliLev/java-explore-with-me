@@ -11,9 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.HitDto;
+import ru.practicum.ewm.EndpointHit;
 import ru.practicum.ewm.StatsClient;
-import ru.practicum.ewm.StatsDto;
+import ru.practicum.ewm.ViewStats;
 import ru.practicum.ewm.dto.CaseUpdatedStatusDto;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.request.*;
@@ -48,7 +48,6 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final LocationRepository locationRepository;
     private final ObjectMapper objectMapper;
-    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
 
     @Override
@@ -200,7 +199,7 @@ public class EventServiceImpl implements EventService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь с id= " + userId + " не найден");
         }
-        PageRequest pageRequest = PageRequest.of(from / size, size, org.springframework.data.domain.Sort.by(Sort.Direction.ASC, "id"));
+        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id"));
         return eventRepository.findAll(pageRequest)
                 .getContent()
                 .stream()
@@ -273,8 +272,8 @@ public class EventServiceImpl implements EventService {
 
                 List<Request> confirmedRequests = requestRepository.findAllById(updatedStatusConfirmed.getProcessedIds());
                 List<Request> rejectedRequests = new ArrayList<>();
-                if (!updatedStatusConfirmed.getIdsFromUpdateStatus()
-                        .isEmpty()) {
+                if (updatedStatusConfirmed.getIdsFromUpdateStatus()
+                        .size() != 0) {
                     List<Long> ids = updatedStatusConfirmed.getIdsFromUpdateStatus();
                     rejectedRequests = rejectRequest(ids, eventId);
                 }
@@ -314,10 +313,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getAllEventFromPublic(SearchEventParams searchEventParams, HttpServletRequest request) {
-
         if (searchEventParams.getRangeEnd() != null && searchEventParams.getRangeStart() != null && (searchEventParams.getRangeEnd()
                 .isBefore(searchEventParams.getRangeStart()))) {
             throw new UncorrectedParametersException("Дата окончания не может быть раньше даты начала");
+
         }
 
         addStatsClient(request);
@@ -388,20 +387,23 @@ public class EventServiceImpl implements EventService {
         addStatsClient(request);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
-        Long views = viewStatsMap.getOrDefault(event.getId(), 0L);
+        Long views = 0L;
+        if (viewStatsMap.containsKey(event.getId())) {
+            views++;
+        }
         eventFullDto.setViews(views);
         return eventFullDto;
     }
 
     private Event checkEvent(Long eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("События с id = " + eventId + " не существует."));
+                .orElseThrow(() -> new NotFoundException("События с id = " + eventId + " не существует"));
     }
 
     private User checkUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new NotFoundException("Пользователя с id = " + userId + " не существует."));
+                        () -> new NotFoundException("Пользователя с id = " + userId + " не существует"));
     }
 
     private List<Request> checkRequestOrEventList(Long eventId, List<Long> requestId) {
@@ -444,11 +446,10 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> viewStatsMap = new HashMap<>();
 
         if (earliestDate != null) {
-            ResponseEntity<Object> response = statsClient.getStats(earliestDate.format(ISO_FORMATTER), LocalDateTime.now()
-                            .format(ISO_FORMATTER),
+            ResponseEntity<Object> response = statsClient.getStats(earliestDate, LocalDateTime.now(),
                     uris, true);
 
-            List<StatsDto> viewStatsList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
+            List<ViewStats> viewStatsList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
             });
 
             viewStatsMap = viewStatsList.stream()
@@ -457,7 +458,7 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toMap(
                             statsDto -> Long.parseLong(statsDto.getUri()
                                     .substring("/events/".length())),
-                            StatsDto::getHits
+                            ViewStats::getHits
                     ));
         }
         return viewStatsMap;
@@ -507,12 +508,12 @@ public class EventServiceImpl implements EventService {
     }
 
     private void addStatsClient(HttpServletRequest request) {
-        statsClient.createHit(HitDto.builder()
+        statsClient.createHit(EndpointHit.builder()
                 .app("ewm-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now()
-                        .format(ISO_FORMATTER))
+                        .format(DateTimeFormatter.ISO_DATE_TIME))
                 .build());
     }
 

@@ -43,7 +43,6 @@ public class CompilationServiceImpl implements CompilationService {
         return CompilationMapper.toDto(compilationAfterSave);
     }
 
-
     @Transactional
     @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationDto update) {

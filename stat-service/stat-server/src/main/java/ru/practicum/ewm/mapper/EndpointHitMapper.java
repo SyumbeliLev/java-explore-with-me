@@ -1,28 +1,25 @@
 package ru.practicum.ewm.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.ewm.HitDto;
-import ru.practicum.ewm.StatsDto;
-import ru.practicum.ewm.entity.EndpointHit;
+import ru.practicum.ewm.EndpointHit;
+import ru.practicum.ewm.ViewStats;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @UtilityClass
 public class EndpointHitMapper {
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    public EndpointHit toEndpointHit(HitDto hitDto) {
-        return EndpointHit.builder()
-                .app(hitDto.getApp())
-                .ip(hitDto.getIp())
-                .timestamp(LocalDateTime.parse(hitDto.getTimestamp(), DATE_TIME_FORMATTER))
-                .uri(hitDto.getUri())
+    public ru.practicum.ewm.entity.EndpointHit toEndpointHit(EndpointHit endpointHit) {
+        return ru.practicum.ewm.entity.EndpointHit.builder()
+                .app(endpointHit.getApp())
+                .ip(endpointHit.getIp())
+                .timestamp(LocalDateTime.parse(endpointHit.getTimestamp(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .uri(endpointHit.getUri())
                 .build();
     }
 
-    public StatsDto toViewStatsDto(String app, String uri, long hits) {
-        return StatsDto.builder()
+    public ViewStats toViewStatsDto(String app, String uri, long hits) {
+        return ViewStats.builder()
                 .app(app)
                 .uri(uri)
                 .hits(hits)

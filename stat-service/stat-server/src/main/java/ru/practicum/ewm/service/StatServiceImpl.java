@@ -3,8 +3,8 @@ package ru.practicum.ewm.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.HitDto;
-import ru.practicum.ewm.StatsDto;
+import ru.practicum.ewm.EndpointHit;
+import ru.practicum.ewm.ViewStats;
 import ru.practicum.ewm.mapper.EndpointHitMapper;
 import ru.practicum.ewm.repository.EndpointHitRepository;
 
@@ -17,19 +17,19 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-class HitServiceImpl implements HitService {
+class StatServiceImpl implements StatService {
 
     private final EndpointHitRepository repository;
 
     @Override
-    public HitDto createHit(HitDto dto) {
+    public EndpointHit saveHit(EndpointHit dto) {
         repository.save(EndpointHitMapper.toEndpointHit(dto));
         return dto;
     }
 
     @Override
-    public List<StatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        List<StatsDto> stats = new ArrayList<>();
+    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        List<ViewStats> stats = new ArrayList<>();
 
         if (uris.isEmpty()) {
             uris = repository.findAllHitsBetweenDates(start, end);

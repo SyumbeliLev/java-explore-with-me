@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-class CategoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
-    private final EventRepository eventRepository;
+    private final EventRepository eventsRepository;
 
     @Override
     public List<CategoryDto> getCategories(Integer from, Integer size) {
@@ -31,7 +31,6 @@ class CategoryServiceImpl implements CategoryService {
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public CategoryDto getCategoryById(Long catId) {
@@ -49,7 +48,7 @@ class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategoryById(Long catId) {
         Category category = checkCategory(catId);
-        List<Event> events = eventRepository.findByCategory(category);
+        List<Event> events = eventsRepository.findByCategory(category);
         if (!events.isEmpty()) {
             throw new ConflictException("Can't delete category due to using for some events");
         }

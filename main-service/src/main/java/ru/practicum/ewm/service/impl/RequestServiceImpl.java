@@ -101,7 +101,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Событие не опубликовано");
         }
         if (requestRepository.existsByEventIdAndRequesterId(eventId, userId)) {
-            throw new ConflictException("Попытка добавления дубликата");
+            throw new ConflictException("Попытка добаления дубликата");
         }
     }
 }

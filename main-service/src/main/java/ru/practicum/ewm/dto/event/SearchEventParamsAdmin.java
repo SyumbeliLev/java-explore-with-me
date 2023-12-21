@@ -1,6 +1,5 @@
 package ru.practicum.ewm.dto.event;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.validation.constraints.Positive;
@@ -17,11 +16,7 @@ public class SearchEventParamsAdmin {
     private List<Long> users;
     private List<String> states;
     private List<Long> categories;
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime rangeStart;
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime rangeEnd;
     @PositiveOrZero
     private Integer from = 0;
