@@ -16,7 +16,6 @@ import java.util.Map;
 @Service
 public class StatsClient extends BaseClient {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     @Autowired
     public StatsClient(@Value("${stat-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
@@ -30,7 +29,6 @@ public class StatsClient extends BaseClient {
     public void createHit(EndpointHit dto) {
         post(dto);
     }
-
     public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris,
                                            Boolean unique) {
         Map<String, Object> parameters = Map.of(

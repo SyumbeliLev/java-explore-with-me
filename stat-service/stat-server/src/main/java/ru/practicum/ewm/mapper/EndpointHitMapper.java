@@ -13,7 +13,7 @@ public class EndpointHitMapper {
         return ru.practicum.ewm.entity.EndpointHit.builder()
                 .app(endpointHit.getApp())
                 .ip(endpointHit.getIp())
-                .timestamp(LocalDateTime.parse(endpointHit.getTimestamp(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .timestamp(LocalDateTime.parse(endpointHit.getTimestamp(),DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .uri(endpointHit.getUri())
                 .build();
     }
