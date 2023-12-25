@@ -27,7 +27,7 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public void createHit(EndpointHit dto) {
+    public void createHit(EndpointHitDto dto) {
         post(dto);
     }
 

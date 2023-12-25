@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.EndpointHit;
+import ru.practicum.ewm.EndpointHitDto;
 import ru.practicum.ewm.StatsClient;
 import ru.practicum.ewm.ViewStats;
 import ru.practicum.ewm.dto.CaseUpdatedStatusDto;
@@ -33,7 +34,6 @@ import ru.practicum.ewm.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +48,10 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final LocationRepository locationRepository;
     private final ObjectMapper objectMapper;
+
+
+    @Value("${server.application.name:ewm-service}")
+    private String applicationName;
 
 
     @Override
@@ -313,10 +317,12 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getAllEventFromPublic(SearchEventParams searchEventParams, HttpServletRequest request) {
-        if (searchEventParams.getRangeEnd() != null && searchEventParams.getRangeStart() != null && (searchEventParams.getRangeEnd()
-                .isBefore(searchEventParams.getRangeStart()))) {
-            throw new UncorrectedParametersException("Дата окончания не может быть раньше даты начала");
 
+        if (searchEventParams.getRangeEnd() != null && searchEventParams.getRangeStart() != null) {
+            if (searchEventParams.getRangeEnd()
+                    .isBefore(searchEventParams.getRangeStart())) {
+                throw new UncorrectedParametersException("Дата окончания не может быть раньше даты начала");
+            }
         }
 
         addStatsClient(request);
@@ -505,12 +511,11 @@ public class EventServiceImpl implements EventService {
     }
 
     private void addStatsClient(HttpServletRequest request) {
-        statsClient.createHit(EndpointHit.builder()
-                .app("ewm-service")
+        statsClient.createHit(EndpointHitDto.builder()
+                .app(applicationName)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now()
-                        .format(DateTimeFormatter.ISO_DATE_TIME))
+                .timestamp(LocalDateTime.now())
                 .build());
     }
 

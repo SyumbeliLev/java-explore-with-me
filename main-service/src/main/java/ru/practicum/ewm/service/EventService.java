@@ -1,5 +1,6 @@
 package ru.practicum.ewm.service;
 
+
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.request.*;
 
