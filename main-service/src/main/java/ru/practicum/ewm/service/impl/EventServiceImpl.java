@@ -387,10 +387,7 @@ public class EventServiceImpl implements EventService {
         addStatsClient(request);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
-        Long views = 0L;
-        if (viewStatsMap.containsKey(event.getId())) {
-            views++;
-        }
+        Long views = viewStatsMap.getOrDefault(event.getId(), 0L);
         eventFullDto.setViews(views);
         return eventFullDto;
     }
