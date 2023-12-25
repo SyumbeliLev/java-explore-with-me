@@ -67,7 +67,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru.practicum.ewm.StatsServerApplication
+                    <mainClass>ru.practicum.ewm.StatServerApplication
                     </mainClass> <!-- Замените com.example.MainClass на ваш главный класс -->
                 </configuration>
             </plugin>

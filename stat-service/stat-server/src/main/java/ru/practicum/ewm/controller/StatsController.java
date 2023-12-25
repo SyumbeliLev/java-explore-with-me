@@ -2,6 +2,7 @@ package ru.practicum.ewm.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.EndpointHit;
 import ru.practicum.ewm.ViewStats;
@@ -13,12 +14,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class StatsController {
-
     private final StatService service;
 
     @PostMapping("/hit")
-    public EndpointHit saveHit(@RequestBody EndpointHit hit) {
-        return service.saveHit(hit);
+    @ResponseStatus(HttpStatus.CREATED)
+    public EndpointHit createHit(@RequestBody EndpointHit hitDto) {
+        return service.saveHit(hitDto);
     }
 
     @GetMapping("/stats")
