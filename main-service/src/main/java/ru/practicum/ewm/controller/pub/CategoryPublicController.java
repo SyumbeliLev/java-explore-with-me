@@ -20,14 +20,14 @@ public class CategoryPublicController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                           @RequestParam(defaultValue = "10") @Positive Integer size) {
+    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                           @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("GET запрос на получение категорий списком с размерами");
         return categoryService.getCategories(from, size);
     }
 
     @GetMapping("/{catId}")
-    public CategoryDto getCategory(@PathVariable Long catId) {
+    public CategoryDto getCategory(@PathVariable long catId) {
         log.info("GET запрос на получение категории с id={}", catId);
         return categoryService.getCategoryById(catId);
     }

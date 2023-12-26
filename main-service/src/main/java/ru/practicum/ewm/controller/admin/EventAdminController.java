@@ -12,8 +12,9 @@ import ru.practicum.ewm.service.EventService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static ru.practicum.ewm.Constant.FORMATTER;
 
 
 @RestController
@@ -23,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class EventAdminController {
     private final EventService eventService;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
     @GetMapping
     public List<EventFullDto> searchEvents(@RequestParam(required = false) List<Long> users, @RequestParam(required = false) List<String> states,
@@ -34,8 +35,8 @@ public class EventAdminController {
         SearchEventParamsAdmin searchEventParamsAdmin = SearchEventParamsAdmin.builder()
                 .users(users)
                 .categories(categories)
-                .rangeStart(rangeStart == null ? null : LocalDateTime.parse(rangeStart, formatter))
-                .rangeEnd(rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, formatter))
+                .rangeStart(rangeStart == null ? null : LocalDateTime.parse(rangeStart, FORMATTER))
+                .rangeEnd(rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, FORMATTER))
                 .states(states)
                 .from(from)
                 .size(size)
@@ -44,7 +45,7 @@ public class EventAdminController {
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEventByAdmin(@PathVariable(value = "eventId") @Min(1) Long eventId,
+    public EventFullDto updateEventByAdmin(@PathVariable(value = "eventId") @Min(1) long eventId,
                                            @RequestBody @Valid UpdateEventAdminRequest inputUpdate) {
         log.info("PATCH запрос на обновление списка событий");
         return eventService.updateEventFromAdmin(eventId, inputUpdate);

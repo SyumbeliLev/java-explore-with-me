@@ -6,9 +6,9 @@ import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import java.util.List;
 
 public interface RequestService {
-    ParticipationRequestDto addNewRequest(Long userId, Long eventId);
+    ParticipationRequestDto addNewRequest(long userId, long eventId);
 
-    List<ParticipationRequestDto> getRequestsByUserId(Long userId);
+    List<ParticipationRequestDto> getRequestsByUserId(long userId);
 
-    ParticipationRequestDto cancelRequest(Long userId, Long requestId);
+    ParticipationRequestDto cancelRequest(long userId, long requestId);
 }

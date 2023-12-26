@@ -32,8 +32,8 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = CompilationMapper.toCompilation(compilationDto);
         compilation.setPinned(Optional.ofNullable(compilation.getPinned())
                 .orElse(false));
-
-        Set<Long> compEventIds = (compilationDto.getEvents() != null) ? compilationDto.getEvents() : Collections.emptySet();
+        Set<Long> compEventIds = (compilationDto.getEvents() != null && !compilationDto.getEvents()
+                .isEmpty()) ? compilationDto.getEvents() : Collections.emptySet();
         List<Long> eventIds = new ArrayList<>(compEventIds);
         List<Event> events = eventRepository.findAllByIdIn(eventIds);
         Set<Event> eventsSet = new HashSet<>(events);
@@ -45,8 +45,8 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Transactional
     @Override
-    public CompilationDto updateCompilation(Long compId, UpdateCompilationDto update) {
-        Compilation compilation = checkCompilation(compId);
+    public CompilationDto updateCompilation(long compId, UpdateCompilationDto update) {
+        Compilation compilation = getEntityCompilation(compId);
 
         Set<Long> eventIds = update.getEvents();
 
@@ -70,13 +70,13 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Transactional
     @Override
-    public void deleteCompilation(Long compId) {
-        checkCompilation(compId);
+    public void deleteCompilation(long compId) {
+        getEntityCompilation(compId);
         compilationRepository.deleteById(compId);
     }
 
     @Override
-    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
+    public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
 
         PageRequest pageRequest = PageRequest.of(from, size);
         List<Compilation> compilations;
@@ -94,11 +94,11 @@ public class CompilationServiceImpl implements CompilationService {
 
 
     @Override
-    public CompilationDto findByIdCompilation(Long compId) {
-        return CompilationMapper.toDto(checkCompilation(compId));
+    public CompilationDto findByIdCompilation(long compId) {
+        return CompilationMapper.toDto(getEntityCompilation(compId));
     }
 
-    private Compilation checkCompilation(Long compId) {
+    private Compilation getEntityCompilation(long compId) {
         return compilationRepository.findById(compId)
                 .orElseThrow(
                         () -> new NotFoundException("Compilation с id = " + compId + " не найден"));

@@ -29,7 +29,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventRepository eventRepository;
 
     @Override
-    public ParticipationRequestDto addNewRequest(Long userId, Long eventId) {
+    public ParticipationRequestDto addNewRequest(long userId, long eventId) {
         User user = checkUser(userId);
 
         Event event = eventRepository.findById(eventId)
@@ -57,7 +57,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ParticipationRequestDto> getRequestsByUserId(Long userId) {
+    public List<ParticipationRequestDto> getRequestsByUserId(long userId) {
         checkUser(userId);
         List<Request> result = requestRepository.findAllByRequesterId(userId);
         return result.stream()
@@ -66,7 +66,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
+    public ParticipationRequestDto cancelRequest(long userId, long requestId) {
         checkUser(userId);
         Request request = requestRepository.findByIdAndRequesterId(requestId, userId)
                 .orElseThrow(
@@ -81,13 +81,13 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toParticipationRequestDto(requestAfterSave);
     }
 
-    private User checkUser(Long userId) {
+    private User checkUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() ->
                         new NotFoundException("Категории с id = " + userId + " не существует"));
     }
 
-    private void validateNewRequest(Event event, Long userId, Long eventId) {
+    private void validateNewRequest(Event event, long userId, long eventId) {
         if (event.getInitiator()
                 .getId()
                 .equals(userId)) {

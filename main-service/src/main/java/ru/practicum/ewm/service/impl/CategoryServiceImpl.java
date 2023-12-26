@@ -24,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final EventRepository eventsRepository;
 
     @Override
-    public List<CategoryDto> getCategories(Integer from, Integer size) {
+    public List<CategoryDto> getCategories(int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return categoryRepository.findAll(pageRequest)
                 .stream()
@@ -33,8 +33,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto getCategoryById(Long catId) {
-        Category category = checkCategory(catId);
+    public CategoryDto getCategoryById(long catId) {
+        Category category = getEntity(catId);
         return CategoryMapper.toCategoryDto(category);
     }
 
@@ -46,8 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategoryById(Long catId) {
-        Category category = checkCategory(catId);
+    public void deleteCategoryById(long catId) {
+        Category category = getEntity(catId);
         List<Event> events = eventsRepository.findByCategory(category);
         if (!events.isEmpty()) {
             throw new ConflictException("Can't delete category due to using for some events");
@@ -56,8 +56,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
-        Category oldCategory = checkCategory(catId);
+    public CategoryDto updateCategory(long catId, CategoryDto categoryDto) {
+        Category oldCategory = getEntity(catId);
         String newName = categoryDto.getName();
 
         if (newName != null && !oldCategory.getName()
@@ -77,7 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private Category checkCategory(Long catId) {
+    private Category getEntity(long catId) {
         return categoryRepository.findById(catId)
                 .orElseThrow(() ->
                         new NotFoundException("Категории с id = " + catId + " не существует"));

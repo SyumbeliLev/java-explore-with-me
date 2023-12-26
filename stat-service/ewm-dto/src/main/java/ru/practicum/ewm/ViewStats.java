@@ -1,6 +1,9 @@
 package ru.practicum.ewm;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
 @Builder
 @Getter

@@ -29,48 +29,48 @@ public class EventPrivateController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> getAllEventsByUserId(@PathVariable(value = "userId") @Min(1) Long userId,
+    public List<EventShortDto> getAllEventsByUserId(@PathVariable(value = "userId") @Min(1) long userId,
                                                     @RequestParam(value = "from", defaultValue = "0")
-                                                    @PositiveOrZero Integer from,
+                                                    @PositiveOrZero int from,
                                                     @RequestParam(value = "size", defaultValue = "10")
-                                                    @Positive Integer size) {
+                                                    @Positive int size) {
         log.info("GET запрос на получения событий пользователя с id= {}", userId);
         return eventService.getEventsByUserId(userId, from, size);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto addEvent(@PathVariable(value = "userId") @Min(1) Long userId,
+    public EventFullDto addEvent(@PathVariable(value = "userId") @Min(1) long userId,
                                  @RequestBody @Valid NewEventDto input) {
         log.info("POST запрос на создание события от пользователя с id= {}", userId);
         return eventService.addNewEvent(userId, input);
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getFullEventByOwner(@PathVariable(value = "userId") @Min(1) Long userId,
-                                            @PathVariable(value = "eventId") @Min(1) Long eventId) {
+    public EventFullDto getFullEventByOwner(@PathVariable(value = "userId") @Min(1) long userId,
+                                            @PathVariable(value = "eventId") @Min(1) long eventId) {
         log.info("GET запрос на получения полной информации о событии для пользователя с id= {}", userId);
         return eventService.getEventByUserIdAndEventId(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEventByOwner(@PathVariable(value = "userId") @Min(0) Long userId,
-                                           @PathVariable(value = "eventId") @Min(0) Long eventId,
+    public EventFullDto updateEventByOwner(@PathVariable(value = "userId") @Min(0) long userId,
+                                           @PathVariable(value = "eventId") @Min(0) long eventId,
                                            @RequestBody @Valid UpdateEventUserRequest inputUpdate) {
         log.info("PATCH запрос на обновление события от пользователя с id= {}", userId);
         return eventService.updateEventByUserIdAndEventId(userId, eventId, inputUpdate);
     }
 
     @GetMapping("/{eventId}/requests")
-    public List<ParticipationRequestDto> getAllRequestByEventFromOwner(@PathVariable(value = "userId") @Min(1) Long userId,
-                                                                       @PathVariable(value = "eventId") @Min(1) Long eventId) {
+    public List<ParticipationRequestDto> getAllRequestByEventFromOwner(@PathVariable(value = "userId") @Min(1) long userId,
+                                                                       @PathVariable(value = "eventId") @Min(1) long eventId) {
         log.info("GET запрос на получение информации о всех запросах об участии в событии для пользователя с id= {}", userId);
         return eventService.getAllParticipationRequestsFromEventByOwner(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests")
-    public EventRequestStatusUpdateResult updateStatusRequestFromOwner(@PathVariable(value = "userId") @Min(1) Long userId,
-                                                                       @PathVariable(value = "eventId") @Min(1) Long eventId,
+    public EventRequestStatusUpdateResult updateStatusRequestFromOwner(@PathVariable(value = "userId") @Min(1) long userId,
+                                                                       @PathVariable(value = "eventId") @Min(1) long eventId,
                                                                        @RequestBody EventRequestStatusUpdateRequest inputUpdate) {
         log.info("PATCH запрос на обновление статуса события от пользователя с id= {}", userId);
         return eventService.updateStatusRequest(userId, eventId, inputUpdate);

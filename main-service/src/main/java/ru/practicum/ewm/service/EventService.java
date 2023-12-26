@@ -11,21 +11,21 @@ public interface EventService {
 
     List<EventFullDto> getAllEventFromAdmin(SearchEventParamsAdmin searchEventParamsAdmin);
 
-    EventFullDto updateEventFromAdmin(Long eventId, UpdateEventAdminRequest inputUpdate);
+    EventFullDto updateEventFromAdmin(long eventId, UpdateEventAdminRequest inputUpdate);
 
-    List<EventShortDto> getEventsByUserId(Long userId, Integer from, Integer size);
+    List<EventShortDto> getEventsByUserId(long userId, Integer from, Integer size);
 
-    EventFullDto addNewEvent(Long userId, NewEventDto input);
+    EventFullDto addNewEvent(long userId, NewEventDto input);
 
-    EventFullDto getEventByUserIdAndEventId(Long userId, Long eventId);
+    EventFullDto getEventByUserIdAndEventId(long userId, long eventId);
 
-    EventFullDto updateEventByUserIdAndEventId(Long userId, Long eventId, UpdateEventUserRequest inputUpdate);
+    EventFullDto updateEventByUserIdAndEventId(long userId, long eventId, UpdateEventUserRequest inputUpdate);
 
-    List<ParticipationRequestDto> getAllParticipationRequestsFromEventByOwner(Long userId, Long eventId);
+    List<ParticipationRequestDto> getAllParticipationRequestsFromEventByOwner(long userId, long eventId);
 
-    EventRequestStatusUpdateResult updateStatusRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest inputUpdate);
+    EventRequestStatusUpdateResult updateStatusRequest(long userId, long eventId, EventRequestStatusUpdateRequest inputUpdate);
 
     List<EventShortDto> getAllEventFromPublic(SearchEventParams searchEventParams, HttpServletRequest request);
 
-    EventFullDto getEventById(Long eventId, HttpServletRequest request);
+    EventFullDto getEventById(long eventId, HttpServletRequest request);
 }

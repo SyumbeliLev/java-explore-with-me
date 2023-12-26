@@ -29,13 +29,13 @@ public class CategoryAdminController {
 
     @DeleteMapping("/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable Long catId) {
+    public void deleteCategory(@PathVariable long catId) {
         log.info("DELETE запрос на удалении категории с id =  {} ", catId);
         categoryService.deleteCategoryById(catId);
     }
 
     @PatchMapping("/{catId}")
-    public CategoryDto updateCategory(@PathVariable(value = "catId") @Min(1) Long catId,
+    public CategoryDto updateCategory(@PathVariable(value = "catId") @Min(1) long catId,
                                       @RequestBody @Valid CategoryDto categoryDto) {
         log.info("PATCH запрос на обновление категории с id = {}", catId);
         return categoryService.updateCategory(catId, categoryDto);

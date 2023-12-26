@@ -22,22 +22,22 @@ public class RequestPrivateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ParticipationRequestDto addRequest(@PathVariable(value = "userId") @Min(0) Long userId,
-                                              @RequestParam(name = "eventId") @Min(0) Long eventId) {
+    public ParticipationRequestDto addRequest(@PathVariable(value = "userId") @Min(0) long userId,
+                                              @RequestParam(name = "eventId") @Min(0) long eventId) {
         log.info("POST запрос на создание запроса на участие в событии с id= {}  пользователя с id= {}",
                 eventId, userId);
         return requestService.addNewRequest(userId, eventId);
     }
 
     @GetMapping
-    public List<ParticipationRequestDto> getAllRequests(@PathVariable(value = "userId") @Min(0) Long userId) {
+    public List<ParticipationRequestDto> getAllRequests(@PathVariable(value = "userId") @Min(0) long userId) {
         log.info("GET запрос на получение всех запросов на участие в событиях пользователя с id= {}", userId);
         return requestService.getRequestsByUserId(userId);
     }
 
     @PatchMapping("/{requestId}/cancel")
-    public ParticipationRequestDto canceledRequest(@PathVariable(value = "userId") @Min(0) Long userId,
-                                                   @PathVariable(value = "requestId") @Min(0) Long requestId) {
+    public ParticipationRequestDto canceledRequest(@PathVariable(value = "userId") @Min(0) long userId,
+                                                   @PathVariable(value = "requestId") @Min(0) long requestId) {
         log.info("PATCH запрос на отмену запроса пользователем с id= {}", userId);
         return requestService.cancelRequest(userId, requestId);
     }

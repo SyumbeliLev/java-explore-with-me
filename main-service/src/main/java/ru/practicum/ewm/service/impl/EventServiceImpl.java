@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.EndpointHitDto;
 import ru.practicum.ewm.StatsClient;
 import ru.practicum.ewm.ViewStats;
@@ -37,9 +38,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -109,8 +111,9 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public EventFullDto updateEventFromAdmin(Long eventId, UpdateEventAdminRequest updateEvent) {
-        Event oldEvent = checkEvent(eventId);
+    @Transactional
+    public EventFullDto updateEventFromAdmin(long eventId, UpdateEventAdminRequest updateEvent) {
+        Event oldEvent = getEntityEvent(eventId);
         if (oldEvent.getEventStatus()
                 .equals(EventStatus.PUBLISHED) || oldEvent.getEventStatus()
                 .equals(EventStatus.CANCELED)) {
@@ -152,8 +155,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateEventByUserIdAndEventId(Long userId, Long eventId, UpdateEventUserRequest inputUpdate) {
-        checkUser(userId);
+    @Transactional
+    public EventFullDto updateEventByUserIdAndEventId(long userId, long eventId, UpdateEventUserRequest inputUpdate) {
+        getEntityUser(userId);
         Event oldEvent = checkEvenByInitiatorAndEventId(userId, eventId);
         if (oldEvent.getEventStatus()
                 .equals(EventStatus.PUBLISHED)) {
@@ -199,7 +203,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventsByUserId(Long userId, Integer from, Integer size) {
+    public List<EventShortDto> getEventsByUserId(long userId, Integer from, Integer size) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь с id= " + userId + " не найден");
         }
@@ -212,18 +216,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventByUserIdAndEventId(Long userId, Long eventId) {
-        checkUser(userId);
+    public EventFullDto getEventByUserIdAndEventId(long userId, long eventId) {
+        getEntityUser(userId);
         Event event = checkEvenByInitiatorAndEventId(userId, eventId);
         return EventMapper.toEventFullDto(event);
     }
 
     @Override
-    public EventFullDto addNewEvent(Long userId, NewEventDto eventDto) {
+    @Transactional
+    public EventFullDto addNewEvent(long userId, NewEventDto eventDto) {
         LocalDateTime createdOn = LocalDateTime.now();
-        User user = checkUser(userId);
+        User user = getEntityUser(userId);
         checkDateAndTime(LocalDateTime.now(), eventDto.getEventDate());
-        Category category = checkCategory(eventDto.getCategory());
+        Category category = getCategoryUser(eventDto.getCategory());
         Event event = EventMapper.toEvent(eventDto);
         event.setCategory(category);
         event.setInitiator(user);
@@ -243,8 +248,8 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<ParticipationRequestDto> getAllParticipationRequestsFromEventByOwner(Long userId, Long eventId) {
-        checkUser(userId);
+    public List<ParticipationRequestDto> getAllParticipationRequestsFromEventByOwner(long userId, long eventId) {
+        getEntityUser(userId);
         checkEvenByInitiatorAndEventId(userId, eventId);
         List<Request> requests = requestRepository.findAllByEventId(eventId);
         return requests.stream()
@@ -253,8 +258,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventRequestStatusUpdateResult updateStatusRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest inputUpdate) {
-        checkUser(userId);
+    @Transactional
+    public EventRequestStatusUpdateResult updateStatusRequest(long userId, long eventId, EventRequestStatusUpdateRequest inputUpdate) {
+        getEntityUser(userId);
         Event event = checkEvenByInitiatorAndEventId(userId, eventId);
 
         if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
@@ -376,7 +382,7 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> viewStatsMap = getViewsAllEvents(resultEvents);
 
         for (EventShortDto event : result) {
-            Long viewsFromMap = viewStatsMap.getOrDefault(event.getId(), 0L);
+            long viewsFromMap = viewStatsMap.getOrDefault(event.getId(), 0L);
             event.setViews(viewsFromMap);
         }
 
@@ -384,8 +390,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
-        Event event = checkEvent(eventId);
+    public EventFullDto getEventById(long eventId, HttpServletRequest request) {
+        Event event = getEntityEvent(eventId);
         if (!event.getEventStatus()
                 .equals(EventStatus.PUBLISHED)) {
             throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
@@ -393,36 +399,36 @@ public class EventServiceImpl implements EventService {
         addStatsClient(request);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
-        Long views = viewStatsMap.getOrDefault(event.getId(), 0L);
+        long views = viewStatsMap.getOrDefault(event.getId(), 0L);
         eventFullDto.setViews(views);
         return eventFullDto;
     }
 
-    private Event checkEvent(Long eventId) {
+    private Event getEntityEvent(long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("События с id = " + eventId + " не существует"));
     }
 
-    private User checkUser(Long userId) {
+    private User getEntityUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(
                         () -> new NotFoundException("Пользователя с id = " + userId + " не существует"));
     }
 
-    private List<Request> checkRequestOrEventList(Long eventId, List<Long> requestId) {
+    private List<Request> getRequestOrEventList(long eventId, List<Long> requestId) {
         return requestRepository.findByEventIdAndIdIn(eventId, requestId)
                 .orElseThrow(
                         () -> new NotFoundException("Запроса с id = " + requestId + " или события с id = "
                                 + eventId + "не существуют"));
     }
 
-    private Category checkCategory(Long catId) {
+    private Category getCategoryUser(long catId) {
         return categoryRepository.findById(catId)
                 .orElseThrow(
                         () -> new NotFoundException("Категории с id = " + catId + " не существует"));
     }
 
-    private Event checkEvenByInitiatorAndEventId(Long userId, Long eventId) {
+    private Event checkEvenByInitiatorAndEventId(long userId, long eventId) {
         return eventRepository.findByInitiatorIdAndId(userId, eventId)
                 .orElseThrow(
                         () -> new NotFoundException("События с id = " + eventId + "и с пользователем с id = " + userId +
@@ -472,7 +478,7 @@ public class EventServiceImpl implements EventService {
         int freeRequest = event.getParticipantLimit() - confirmedRequestsCount;
         List<Long> ids = caseUpdatedStatus.getIdsFromUpdateStatus();
         List<Long> processedIds = new ArrayList<>();
-        List<Request> requestListLoaded = checkRequestOrEventList(event.getId(), ids);
+        List<Request> requestListLoaded = getRequestOrEventList(event.getId(), ids);
         List<Request> requestList = new ArrayList<>();
 
         for (Request request : requestListLoaded) {
@@ -492,10 +498,10 @@ public class EventServiceImpl implements EventService {
         return caseUpdatedStatus;
     }
 
-    private List<Request> rejectRequest(List<Long> ids, Long eventId) {
+    private List<Request> rejectRequest(List<Long> ids, long eventId) {
         List<Request> rejectedRequests = new ArrayList<>();
         List<Request> requestList = new ArrayList<>();
-        List<Request> requestListLoaded = checkRequestOrEventList(eventId, ids);
+        List<Request> requestListLoaded = getRequestOrEventList(eventId, ids);
 
         for (Request request : requestListLoaded) {
             if (!request.getStatus()
@@ -519,6 +525,7 @@ public class EventServiceImpl implements EventService {
                 .build());
     }
 
+
     private Map<Long, List<Request>> getConfirmedRequestsCount(List<Event> events) {
         List<Request> requests = requestRepository.findAllByEventIdInAndStatus(events
                 .stream()
@@ -538,7 +545,7 @@ public class EventServiceImpl implements EventService {
         }
         Long gotCategory = updateEvent.getCategory();
         if (gotCategory != null) {
-            Category category = checkCategory(gotCategory);
+            Category category = getCategoryUser(gotCategory);
             oldEvent.setCategory(category);
             hasChanges = true;
         }

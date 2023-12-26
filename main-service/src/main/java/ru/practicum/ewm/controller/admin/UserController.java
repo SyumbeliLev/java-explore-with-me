@@ -25,8 +25,8 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
-                                  @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                  @RequestParam(defaultValue = "10") @Positive Integer size) {
+                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                  @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("GET запрос на получение списка пользователей");
         return userService.getListUsers(ids, from, size);
     }
@@ -40,7 +40,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Long userId) {
+    public void deleteUser(@PathVariable long userId) {
         log.info("DELETE запрос на удаление пользователя");
         userService.deleteUser(userId);
     }

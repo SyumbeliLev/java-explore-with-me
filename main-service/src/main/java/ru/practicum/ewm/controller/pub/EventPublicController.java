@@ -11,9 +11,11 @@ import ru.practicum.ewm.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static ru.practicum.ewm.Constant.FORMATTER;
 
 @RestController
 @Slf4j
@@ -22,7 +24,6 @@ import java.util.List;
 @RequestMapping(path = "/events")
 public class EventPublicController {
     private final EventService eventService;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping
     public List<EventShortDto> getAllEvents(@RequestParam(required = false) String text, @RequestParam(required = false) List<Long> categories,
@@ -37,8 +38,8 @@ public class EventPublicController {
                 .text(text)
                 .categories(categories)
                 .paid(paid)
-                .rangeStart(rangeStart == null ? null : LocalDateTime.parse(rangeStart, formatter))
-                .rangeEnd(rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, formatter))
+                .rangeStart(rangeStart == null ? null : LocalDateTime.parse(rangeStart, FORMATTER))
+                .rangeEnd(rangeEnd == null ? null : LocalDateTime.parse(rangeEnd, FORMATTER))
                 .onlyAvailable(onlyAvailable)
                 .sort(sort)
                 .from(from)
@@ -48,7 +49,7 @@ public class EventPublicController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getEventById(@PathVariable(value = "eventId") @Min(1) Long eventId,
+    public EventFullDto getEventById(@PathVariable(value = "eventId") @Min(1) long eventId,
                                      HttpServletRequest request) {
         log.info("GET запрос на получения полной информации о событии с  id= {}", eventId);
         return eventService.getEventById(eventId, request);
