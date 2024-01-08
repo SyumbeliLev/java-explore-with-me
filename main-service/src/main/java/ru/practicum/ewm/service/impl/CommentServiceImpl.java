@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto patchByUser(Long userId, Long commentId, UpdateCommentDto updateCommentDto) {
+    public CommentDto patchByUser(long userId, long commentId, UpdateCommentDto updateCommentDto) {
         User user = checkUser(userId);
         Comment comment = getEntityById(commentId);
         checkAuthorComment(user, comment);
@@ -54,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CommentDto> getCommentUser(Long userId) {
+    public List<CommentDto> getCommentUser(long userId) {
         checkUser(userId);
         List<Comment> commentList = commentRepository.findByAuthor_Id(userId);
         return commentList.stream()
@@ -64,24 +64,27 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Comment getUserCommentByUserAndCommentId(Long userId, Long commentId) {
+    public CommentDto getUserCommentByUserAndCommentId(long userId, long commentId) {
         checkUser(userId);
-        return commentRepository.findByAuthor_IdAndId(userId, commentId)
+        Comment entity = commentRepository.findByAuthor_IdAndId(userId, commentId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("У пользователя c id=%d  не найден комментарий с id=%d", userId, commentId)));
+        return CommentMapper.toCommentDto(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Comment> getCommentEvent(Long eventId, Integer from, Integer size) {
-        Event event = checkEvent(eventId);
+    public List<CommentDto> getCommentEvent(long eventId, Integer from, Integer size) {
+        checkEvent(eventId);
         PageRequest pageable = PageRequest.of(from / size, size);
-        return commentRepository.findAllByEvent_Id(eventId, pageable);
-
+        return commentRepository.findAllByEvent_Id(eventId, pageable)
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteComment(Long userId, Long commentId) {
+    public void deleteComment(long userId, long commentId) {
         User user = checkUser(userId);
         Comment comment = getEntityById(commentId);
         checkAuthorComment(user, comment);
@@ -89,24 +92,27 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteCommentByAdmin(Long commentId) {
+    public void deleteCommentByAdmin(long commentId) {
         getEntityById(commentId);
         commentRepository.deleteById(commentId);
     }
 
     @Override
-    @Transactional
-    public List<Comment> search(String text, Integer from, Integer size) {
+    @Transactional(readOnly = true)
+    public List<CommentDto> search(String text, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from / size, size);
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return commentRepository.search(text, pageable);
+        return commentRepository.search(text, pageable)
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     @Override
-    public CommentDto createComment(Long userId, Long eventId, NewCommentDto commentDto) {
+    public CommentDto createComment(long userId, long eventId, NewCommentDto commentDto) {
         Event event = checkEvent(eventId);
         User user = checkUser(userId);
         if (!event.getEventStatus()
@@ -116,19 +122,19 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, event, user)));
     }
 
-    private Event checkEvent(Long id) {
+    private Event checkEvent(long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Событие с id=%d  не найдено", id)));
     }
 
-    private User checkUser(Long id) {
+    private User checkUser(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Пользователь c id=%d  не найден", id)));
     }
 
-    private Comment getEntityById(Long id) {
+    private Comment getEntityById(long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Комментарий c id=%d  не найден", id)));
